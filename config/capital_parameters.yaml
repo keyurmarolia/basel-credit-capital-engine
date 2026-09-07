@@ -1,0 +1,18 @@
+capital:
+  common_equity: 600000000000
+  retained_earnings: 60000000000
+  cet1_deductions: 10000000000
+  at1: 60000000000
+  tier2: 90000000000
+external_rwa:
+  market_rwa: 110000000000
+  operational_rwa: 140000000000
+  source: SYNTHETIC_CONFIGURED_INPUTS
+  market_method_note: In a bank, market-risk capital is calculated from the applicable market-risk framework and multiplied by 12.5 to obtain RWA.
+  operational_method_note: In a bank, operational-risk capital is calculated from the Business Indicator Component and Internal Loss Multiplier, then multiplied by 12.5 to obtain RWA.
+requirements:
+  cet1_minimum: 0.045
+  tier1_minimum: 0.060
+  total_minimum: 0.080
+  capital_conservation_buffer: 0.025
+  other_buffers: 0.000

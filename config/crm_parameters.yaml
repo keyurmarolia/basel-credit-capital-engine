@@ -1,0 +1,10 @@
+collateral:
+  none: {eligible: false, haircut: 1.00, treatment: none}
+  residential_property: {eligible: true, haircut: 0.20, treatment: ltv_and_lgd}
+  commercial_property: {eligible: true, haircut: 0.30, treatment: ltv_and_lgd}
+  cash: {eligible: true, haircut: 0.00, treatment: exposure_reduction}
+  government_securities: {eligible: true, haircut: 0.05, treatment: exposure_reduction}
+guarantee:
+  eligible_haircut: 0.10
+  guarantor_risk_weight: 0.20
+

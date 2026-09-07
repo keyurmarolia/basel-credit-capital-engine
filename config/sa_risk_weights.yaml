@@ -1,0 +1,31 @@
+rating_risk_weights:
+  sovereign: {AAA: 0.00, AA: 0.00, A: 0.20, BBB: 0.50, BB: 1.00, B: 1.00, CCC: 1.50, UNRATED: 1.00}
+  bank: {AAA: 0.20, AA: 0.20, A: 0.30, BBB: 0.50, BB: 1.00, B: 1.50, CCC: 1.50, UNRATED: 0.50}
+  corporate: {AAA: 0.20, AA: 0.20, A: 0.50, BBB: 0.75, BB: 1.00, B: 1.50, CCC: 1.50, UNRATED: 1.00}
+fixed_risk_weights:
+  corporate_sme: 0.85
+  regulatory_retail: 0.75
+  retail_transactor: 0.45
+  revolving_retail: 0.75
+  other_retail: 1.00
+  other: 1.00
+  defaulted: 1.50
+mortgage_ltv_bands_not_income_dependent:
+  - {max_ltv: 0.50, risk_weight: 0.20}
+  - {max_ltv: 0.60, risk_weight: 0.25}
+  - {max_ltv: 0.80, risk_weight: 0.30}
+  - {max_ltv: 0.90, risk_weight: 0.40}
+  - {max_ltv: 1.00, risk_weight: 0.50}
+  - {max_ltv: 999.00, display_band: "Above 100%", risk_weight: 0.70}
+mortgage_ltv_bands_income_dependent:
+  - {max_ltv: 0.50, risk_weight: 0.30}
+  - {max_ltv: 0.60, risk_weight: 0.35}
+  - {max_ltv: 0.80, risk_weight: 0.45}
+  - {max_ltv: 0.90, risk_weight: 0.60}
+  - {max_ltv: 1.00, risk_weight: 0.75}
+  - {max_ltv: 999.00, display_band: "Above 100%", risk_weight: 1.05}
+notes:
+  - Educational selected-scope mapping; consult CRE20 and jurisdictional rules before real use.
+  - Residential real-estate implementation uses the Basel whole-loan LTV approach.
+  - LTV risk weights depend on whether repayment materially depends on property cash flows.
+  - The numeric value 999 is only an internal open-ended lookup sentinel. It is displayed as Above 100% and is never interpreted as an LTV.

@@ -1,0 +1,10 @@
+rules:
+  no_commitment: {ccf: 0.00, rule_id: CCF_NO_UNDRAWN_COMMITMENT, basel_reference: CRE20.94}
+  unconditionally_cancellable: {ccf: 0.10, rule_id: CCF_UCC_10, basel_reference: CRE20.97}
+  short_term_trade_letter: {ccf: 0.20, rule_id: CCF_TRADE_20, basel_reference: CRE20.96}
+  other_commitment: {ccf: 0.40, rule_id: CCF_COMMITMENT_40, basel_reference: CRE20.95}
+  transaction_related_contingent: {ccf: 0.50, rule_id: CCF_TRANSACTION_50, basel_reference: CRE20.95}
+  direct_credit_substitute: {ccf: 1.00, rule_id: CCF_SUBSTITUTE_100, basel_reference: CRE20.95}
+notes:
+  - CCF is selected from the contractual off-balance-sheet commitment type, not from a broad product label.
+  - Funded exposure remains on balance sheet; CCF applies only to the committed undrawn amount.

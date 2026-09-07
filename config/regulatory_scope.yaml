@@ -1,0 +1,15 @@
+project_name: Basel Credit Capital Engine
+framework: Basel Committee global framework
+jurisdiction_mode: basel_global_educational
+effective_date: 2026-06-30
+reporting_date: 2026-06-30
+prior_reporting_date: 2025-12-31
+base_currency: INR
+portfolio_size: 30000
+random_seed: 42
+output_floor_rate: 0.65
+parameter_set: global_basel_selected_scope_2026
+limitations:
+  - Synthetic educational portfolio; not a regulatory submission.
+  - IRB mechanics do not imply supervisory approval.
+  - Jurisdiction-specific national discretion is not asserted.

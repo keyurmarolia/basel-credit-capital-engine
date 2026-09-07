@@ -1,0 +1,31 @@
+name: Validate Basel Credit Capital Engine
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install dependencies
+        run: python -m pip install -e ".[dev]"
+      - name: Lint source and tests
+        run: ruff check src tests scripts
+      - name: Run automated tests
+        run: pytest
+      - name: Build a CI-sized portfolio
+        run: python scripts/run_pipeline.py --portfolio-size 2000
+      - name: Build and execute notebooks
+        run: |
+          python scripts/build_notebooks.py
+          for notebook in notebooks/*.ipynb; do
+            jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=300 "$notebook"
+          done
+      - name: Audit notebook outputs
+        run: python scripts/audit_notebooks.py

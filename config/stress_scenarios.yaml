@@ -1,0 +1,29 @@
+scenarios:
+  base:
+    pd_multiplier: 1.00
+    cyclical_sector_pd_multiplier: 1.00
+    retail_pd_multiplier: 1.00
+    lgd_addon: 0.00
+    collateral_shock: 0.00
+    undrawn_utilisation_addon: 0.00
+    loss_rate: 0.000
+  adverse:
+    pd_multiplier: 1.35
+    cyclical_sector_pd_multiplier: 1.65
+    retail_pd_multiplier: 1.50
+    lgd_addon: 0.075
+    collateral_shock: 0.12
+    undrawn_utilisation_addon: 0.10
+    loss_rate: 0.012
+  severe:
+    pd_multiplier: 1.85
+    cyclical_sector_pd_multiplier: 2.80
+    retail_pd_multiplier: 2.35
+    lgd_addon: 0.15
+    collateral_shock: 0.25
+    undrawn_utilisation_addon: 0.25
+    loss_rate: 0.030
+cyclical_sectors: [Construction, Real Estate, Metals, Textiles, Auto Components]
+retail_products: [mortgage, personal_loan, credit_card]
+assumption_source: SYNTHETIC_PROJECT_SENSITIVITIES
+calibration_note: A bank would connect approved macroeconomic paths to portfolio PD, LGD, EAD, income and capital through models estimated on representative historical data and expert-reviewed overlays.

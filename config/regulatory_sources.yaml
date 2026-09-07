@@ -1,0 +1,57 @@
+sources:
+  - source_id: RBC20
+    topic: Minimum capital ratios, RWA aggregation and aggregate output floor
+    url: https://www.bis.org/basel_framework/chapter/RBC/20.htm
+    accessed_date: 2026-08-22
+  - source_id: RBC90
+    topic: Output-floor transitional calibration
+    url: https://www.bis.org/basel_framework/chapter/RBC/90.htm
+    accessed_date: 2026-08-22
+  - source_id: CRE20
+    topic: Standardised Approach individual exposures
+    url: https://www.bis.org/basel_framework/chapter/CRE/20.htm
+    accessed_date: 2026-08-22
+  - source_id: CRE21
+    topic: Use of external ratings
+    url: https://www.bis.org/basel_framework/chapter/CRE/21.htm
+    accessed_date: 2026-08-22
+  - source_id: CRE22
+    topic: Credit risk mitigation
+    url: https://www.bis.org/basel_framework/chapter/CRE/22.htm
+    accessed_date: 2026-08-22
+  - source_id: CRE31
+    topic: IRB risk-weight functions
+    url: https://www.bis.org/basel_framework/chapter/CRE/31.htm
+    accessed_date: 2026-08-22
+  - source_id: CRE30
+    topic: IRB exposure classes and restrictions on use of A-IRB
+    url: https://www.bis.org/basel_framework/chapter/CRE/30.htm
+    accessed_date: 2026-08-22
+  - source_id: CRE32
+    topic: IRB PD, LGD, EAD and effective maturity components
+    url: https://www.bis.org/basel_framework/chapter/CRE/32.htm
+    accessed_date: 2026-08-22
+  - source_id: CRE36
+    topic: Long-run PD, downturn LGD and own-estimate requirements
+    url: https://www.bis.org/basel_framework/chapter/CRE/36.htm
+    accessed_date: 2026-08-22
+  - source_id: DIS40
+    topic: Credit-risk disclosure concepts
+    url: https://www.bis.org/basel_framework/chapter/DIS/40.htm
+    accessed_date: 2026-08-22
+  - source_id: MAR20
+    topic: Market-risk capital requirements and conversion to market RWA
+    url: https://www.bis.org/basel_framework/chapter/MAR/20.htm
+    accessed_date: 2026-08-23
+  - source_id: OPE10
+    topic: Operational-risk definitions and Business Indicator components
+    url: https://www.bis.org/basel_framework/chapter/OPE/10.htm
+    accessed_date: 2026-08-23
+  - source_id: OPE25
+    topic: Operational-risk Standardised Approach, BIC, ILM and RWA
+    url: https://www.bis.org/basel_framework/chapter/OPE/25.htm
+    accessed_date: 2026-08-23
+  - source_id: BCBS_STRESS_2018
+    topic: Stress-testing principles for banks and supervisors
+    url: https://www.bis.org/bcbs/publ/d450.htm
+    accessed_date: 2026-08-23

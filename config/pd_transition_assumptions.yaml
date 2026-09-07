@@ -1,0 +1,22 @@
+grade_order: [AAA, AA, A, BBB, BB, B, CCC, D]
+matrix_method:
+  stay_probability: 0.84
+  upgrade_probability: 0.05
+  description: Remaining non-default probability is assigned to a one-grade downgrade. AAA has no upgrade; its upgrade share remains in AAA. CCC has no lower performing grade; its downgrade share remains in CCC.
+profiles:
+  sovereign:
+    default_rates: {AAA: 0.00001, AA: 0.00005, A: 0.00020, BBB: 0.00080, BB: 0.00600, B: 0.03000, CCC: 0.14000}
+  bank:
+    default_rates: {AAA: 0.00003, AA: 0.00010, A: 0.00040, BBB: 0.00150, BB: 0.01000, B: 0.04500, CCC: 0.18000}
+  corporate:
+    default_rates: {AAA: 0.00005, AA: 0.00020, A: 0.00080, BBB: 0.00350, BB: 0.01500, B: 0.06000, CCC: 0.22000}
+  residential_mortgage:
+    default_rates: {AAA: 0.00010, AA: 0.00030, A: 0.00100, BBB: 0.00400, BB: 0.01800, B: 0.06500, CCC: 0.20000}
+  qualifying_revolving_retail:
+    default_rates: {AAA: 0.00020, AA: 0.00060, A: 0.00200, BBB: 0.00700, BB: 0.02800, B: 0.09000, CCC: 0.26000}
+  other_retail:
+    default_rates: {AAA: 0.00015, AA: 0.00050, A: 0.00160, BBB: 0.00600, BB: 0.02400, B: 0.08000, CCC: 0.24000}
+notes:
+  - These are transparent synthetic long-run anchors for education, not published agency transition data.
+  - The D column is used as the long-run one-year PD assigned to each grade or retail pool.
+  - Real IRB estimation requires observed multi-year internal or suitably mapped external default experience and supervisory approval.
