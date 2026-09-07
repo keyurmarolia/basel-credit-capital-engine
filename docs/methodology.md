@@ -2,7 +2,7 @@
 
 ## Calculation authority
 
-Functions in `src/basel_credit_risk/` are authoritative. Notebooks, tables, charts and Excel are reporting outputs.
+Functions in `src/basel_credit_risk/` calculate loan-level results. The notebooks own the explanations, worked examples and charts; they are executed directly, not recreated from a separate template.
 
 Calculations retain INR values. Reader-facing reports divide monetary values by 10,000,000 and display INR crore.
 
@@ -14,7 +14,9 @@ The generated balances, ratings, defaults, collateral values, recoveries and mat
 
 ## Classification and EAD
 
-Source classes are retained beside regulatory classes. Unmapped classes create an exception.
+Source classes are retained beside regulatory classes. Unknown products and unmapped classes stop the calculation. Mandatory fields are checked for missing values, finite amounts, valid categories, consistent borrower attributes and reconciled limits.
+
+Corporate SME eligibility uses consolidated annual sales no higher than EUR 50 million. Regulatory retail eligibility checks the EUR 1 million aggregate counterparty limit and 0.2% granularity threshold on the eligible performing pool. Off-balance-sheet amounts enter that screening after the contractual CCF. The assumed INR/EUR conversion is 100; a bank would source and govern the applicable reporting-date conversion. Separate IRB qualifying-revolving-retail checks use individual, unsecured, revolving facilities with limits up to EUR 100,000. Retail-pool management and low loss-volatility eligibility are synthetic assumptions, not empirical findings.
 
 ```text
 Funded exposure = outstanding balance + accrued interest
@@ -40,14 +42,18 @@ SA RWA = unguaranteed EAD × borrower risk weight
 
 Risk weights use regulatory class, rating or mortgage LTV. Mortgage LTV uses outstanding principal plus committed undrawn exposure divided by prudent property value. Separate grids apply when repayment materially depends on property cash flow.
 
+Guarantee substitution is used only in the Standardised Approach calculation. The IRB layer does not recognise guarantees, double-default treatment or an alternative guarantor parameter set.
+
+Rated corporate SMEs use the corporate rating table. The 85% SME weight is reserved for qualifying unrated corporate SMEs. The represented bank route uses external ratings, not the unrated-bank SCRA route. Defaulted SA exposures use a disclosed simplified 150% treatment; provision-dependent and defaulted-mortgage exceptions are outside this implementation.
+
 ## IRB approach
 
 The engine develops the four IRB components separately.
 
 - Long-run PD is the synthetic transition matrix's one-year default-column rate for the assigned borrower grade or retail pool.
-- Downturn LGD is built from discounted collateral and unsecured recoveries, workout cost and recovery time.
+- Own-estimate downturn LGD is built from discounted collateral proceeds and unsecured recovery on the remaining claim, workout cost and recovery time, using IRB EAD throughout.
 - IRB EAD is funded exposure plus an IRB CCF multiplied by undrawn exposure.
-- Effective maturity is subject to the ordinary one-year floor and five-year cap represented in this scope.
+- Foundation facilities use supervisory 2.5-year maturity. Other non-retail facilities use contractual maturity as a conservative proxy, bounded between one and five years. A bank with a cash-flow schedule would calculate the applicable cash-flow-weighted maturity.
 - Correlation follows the Basel corporate, SME, residential mortgage, qualifying revolving retail or other-retail function.
 
 ```text
@@ -56,6 +62,10 @@ IRB RWA = 12.5 × K × EAD
 ```
 
 K is unexpected-loss capital after the applicable IRB adjustments. Corporate, sovereign and bank functions use the represented maturity adjustment. Retail functions do not use the full maturity adjustment.
+
+Foundation LGD is 45% for senior unsecured bank claims and 40% for senior unsecured other corporates. Eligible cash has 0% secured LGD; eligible property has 20% secured LGD after a 40% collateral haircut. Secured and unsecured portions are weighted by IRB EAD. Synthetic recovery LGD remains a comparison, not the foundation capital input.
+
+Own-estimate LGD floors are 5% for mortgages, 50% for qualifying revolving retail, 30% for unsecured other retail and 25% for unsecured corporates. Secured corporate/other-retail floors use collateral-specific weighted portions. Sovereigns have no LGD floor. PD floors are 0.10% for QRRE revolvers and 0.05% for other non-sovereign exposures. Own-estimate non-sovereign EAD is floored at funded exposure plus 50% of the SA-converted undrawn amount. Own CCFs apply only to eligible revolving commitments.
 
 The transition probabilities, recovery assumptions and own CCFs are synthetic. A bank would estimate long-run PD from multi-year one-year default observations by grade or pool; LGD from discounted recoveries, costs and time to recovery on defaulted facilities with downturn adjustment; and CCF/EAD from realised drawings before default. Representative data, validation and a margin of conservatism would be required.
 
@@ -86,11 +96,13 @@ The project also reports Top-10 and Top-20 borrower shares.
 
 ## RWA attribution
 
-The bridge starts with prior RWA and explains new business, run-off, EAD, PD, LGD and maturity effects. Nonlinear interaction remains as a residual. The bridge must reconcile to current RWA.
+The bridge separates new business and run-off, then replaces the surviving loans' EAD, PD, LGD, maturity and class/eligibility/default inputs in that order. Each step reruns the IRB function. Interactions are allocated to the later step, so contributions depend on the stated order; the final residual is numerical rounding, not an unexplained allocation. Prior-period grades and contractual maturities genuinely differ from current inputs.
 
 ## Stress testing
 
 Adverse and severe scenarios change PD, LGD, collateral and utilisation. The engine then recalculates EAD and RWA.
+
+The long-run PD anchor is preserved; a separate scenario PD receives the shock. Synthetic recovery add-ons affect own-estimate LGD, not the prescribed unsecured foundation LGD. Collateral deterioration can change the foundation secured/unsecured split. Market and operational RWA stay fixed. Scenario migration does not change default flags or external ratings in this sensitivity exercise.
 
 ```text
 Stress loss = scenario loss rate × scenario EAD

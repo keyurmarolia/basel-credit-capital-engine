@@ -10,8 +10,7 @@ def test_ccf_comes_from_commitment_type() -> None:
     result = run_pipeline(portfolio_size=1_000, write_outputs=False)
     frame = result.exposures
     expected = {
-        name: float(rule["ccf"])
-        for name, rule in result.configs["ccf_parameters"]["rules"].items()
+        name: float(rule["ccf"]) for name, rule in result.configs["ccf_parameters"]["rules"].items()
     }
     mapped = frame["commitment_type"].map(expected)
     assert np.allclose(frame["ccf"], mapped)
@@ -30,9 +29,7 @@ def test_transition_matrices_sum_to_one() -> None:
     result = run_pipeline(portfolio_size=500, write_outputs=False)
     config = result.configs["pd_transition_assumptions"]
     for profile in config["profiles"].values():
-        matrix = build_transition_matrix(
-            profile, config["matrix_method"], config["grade_order"]
-        )
+        matrix = build_transition_matrix(profile, config["matrix_method"], config["grade_order"])
         assert np.allclose(matrix.sum(axis=1), 1.0)
 
 
@@ -58,6 +55,9 @@ def test_downturn_lgd_is_not_below_normal_lgd() -> None:
 def test_effective_maturity_has_one_year_floor_and_five_year_cap() -> None:
     frame = run_pipeline(portfolio_size=1_000, write_outputs=False).exposures
     assert frame["m_effective"].between(1.0, 5.0).all()
+    foundation = frame["irb_parameter_source"].eq("FOUNDATION_SUPERVISORY_PARAMETERS")
+    assert frame.loc[foundation, "m_effective"].eq(2.5).all()
+    frame = frame.loc[~foundation]
     assert frame.loc[frame["maturity_input"].gt(5), "m_effective"].eq(5).all()
     assert frame.loc[frame["maturity_input"].lt(1), "m_effective"].eq(1).all()
 

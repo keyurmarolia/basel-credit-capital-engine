@@ -9,8 +9,9 @@ sources:
     accessed_date: 2026-08-22
   - source_id: CRE20
     topic: Standardised Approach individual exposures
-    url: https://www.bis.org/basel_framework/chapter/CRE/20.htm
-    accessed_date: 2026-08-22
+    url: https://www.bis.org/committees/bcbs/basel-framework/standard/cre/20/inforce/2023-01-01/published/2020-11-26
+    accessed_date: 2026-08-31
+    paragraphs: SME 20.47; retail 20.65 to 20.68; CCF 20.95 to 20.100
   - source_id: CRE21
     topic: Use of external ratings
     url: https://www.bis.org/basel_framework/chapter/CRE/21.htm
@@ -29,8 +30,9 @@ sources:
     accessed_date: 2026-08-22
   - source_id: CRE32
     topic: IRB PD, LGD, EAD and effective maturity components
-    url: https://www.bis.org/basel_framework/chapter/CRE/32.htm
-    accessed_date: 2026-08-22
+    url: https://www.bis.org/committees/bcbs/basel-framework/standard/cre/32/inforce/2023-01-01/published/2020-03-27
+    accessed_date: 2026-08-31
+    paragraphs: Foundation LGD 32.6 and 32.10 to 32.11; floors 32.16 and 32.58; EAD 32.36; maturity 32.44 to 32.48
   - source_id: CRE36
     topic: Long-run PD, downturn LGD and own-estimate requirements
     url: https://www.bis.org/basel_framework/chapter/CRE/36.htm

@@ -7,6 +7,7 @@ Parameters are stored in `config/`. Calculation outputs retain rule IDs where ap
 | `regulatory_scope.yaml` | Date, portfolio size, currency and output floor | RBC20, RBC90 |
 | `sa_risk_weights.yaml` | SA risk weights | CRE20, CRE21 |
 | `ccf_parameters.yaml` | Credit conversion factors | CRE20 |
+| `classification_parameters.yaml` | Sales, retail size and granularity thresholds; synthetic currency conversion | CRE20.47, CRE20.65, CRE30.23 |
 | `crm_parameters.yaml` | Collateral and guarantees | CRE22 |
 | `irb_parameters.yaml` | IRB floors and functions | CRE30 to CRE36 |
 | `pd_transition_assumptions.yaml` | Synthetic transition matrices and long-run PD anchors | CRE36 estimation concepts |

@@ -28,11 +28,24 @@ def calculate_sa_rwa(df: pd.DataFrame, sa_config: dict, crm_config: dict) -> pd.
 
     def risk_weight(row: pd.Series) -> tuple[float, str]:
         cls = row["basel_exposure_class"]
-        rating = row["external_rating"] if row["external_rating"] in {"AAA", "AA", "A", "BBB", "BB", "B", "CCC"} else "UNRATED"
+        rating = (
+            row["external_rating"]
+            if row["external_rating"] in {"AAA", "AA", "A", "BBB", "BB", "B", "CCC"}
+            else "UNRATED"
+        )
         if cls == "defaulted":
             return float(fixed["defaulted"]), "SA_DEFAULTED"
+        if cls == "corporate_sme":
+            rw = (
+                fixed["corporate_sme"]
+                if rating == "UNRATED"
+                else rating_tables["corporate"][rating]
+            )
+            return float(rw), f"SA_CORPORATE_SME_{rating}"
         if cls in rating_tables:
-            return float(rating_tables[cls].get(rating, rating_tables[cls]["UNRATED"])), f"SA_{cls.upper()}_{rating}"
+            return float(
+                rating_tables[cls].get(rating, rating_tables[cls]["UNRATED"])
+            ), f"SA_{cls.upper()}_{rating}"
         if cls == "residential_real_estate":
             bands = (
                 income_dependent_bands
@@ -40,7 +53,9 @@ def calculate_sa_rwa(df: pd.DataFrame, sa_config: dict, crm_config: dict) -> pd.
                 else standard_mortgage_bands
             )
             rw = _mortgage_weight(float(row["ltv"]), bands)
-            dependency = "INCOME_DEPENDENT" if row["property_cashflow_dependent"] else "OWNER_REPAYMENT"
+            dependency = (
+                "INCOME_DEPENDENT" if row["property_cashflow_dependent"] else "OWNER_REPAYMENT"
+            )
             return rw, f"SA_MORTGAGE_{dependency}_LTV_{rw:.2f}"
         return float(fixed.get(cls, fixed["other"])), f"SA_FIXED_{str(cls).upper()}"
 
@@ -48,6 +63,13 @@ def calculate_sa_rwa(df: pd.DataFrame, sa_config: dict, crm_config: dict) -> pd.
     out[["sa_risk_weight", "sa_rule_id"]] = assigned
     out["sa_rwa_before_guarantee"] = out["sa_ead_post_crm"] * out["sa_risk_weight"]
     guarantee_rw = float(crm_config["guarantee"]["guarantor_risk_weight"])
-    out["sa_rwa"] = out["unguaranteed_portion"] * out["sa_risk_weight"] + out["guaranteed_portion"] * guarantee_rw
-    out["sa_rwa_density"] = np.where(out["sa_ead_post_crm"] > 0, out["sa_rwa"] / out["sa_ead_post_crm"], 0.0)
+    # Protection need not be recognised where it would increase the charge.
+    out["guarantor_risk_weight_used"] = np.minimum(out["sa_risk_weight"], guarantee_rw)
+    out["sa_rwa"] = (
+        out["unguaranteed_portion"] * out["sa_risk_weight"]
+        + out["guaranteed_portion"] * out["guarantor_risk_weight_used"]
+    )
+    out["sa_rwa_density"] = np.where(
+        out["sa_ead_post_crm"] > 0, out["sa_rwa"] / out["sa_ead_post_crm"], 0.0
+    )
     return out

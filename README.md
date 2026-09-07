@@ -1,8 +1,30 @@
 # Basel Credit Capital Engine
 
+## Scope
+
+This educational project demonstrates a complete, reproducible Basel credit-capital calculation using synthetic data.
+
 This project follows 30,000 synthetic bank loans from contractual data to Standardised Approach Credit RWA, IRB Credit RWA, stress results and capital adequacy.
 
 All calculations occur at loan level before aggregation. The Standardised Approach is completed before IRB begins.
+
+## Reproducibility
+
+The project uses Python 3.12. Dependencies and test tools are defined in `pyproject.toml`.
+
+```bash
+python -m pip install --upgrade pip
+python -m pip install -e ".[dev]"
+```
+
+| Entry point | Result |
+|---|---|
+| `python scripts/run_pipeline.py` | Configured full portfolio and calculation tables |
+| `python scripts/execute_notebooks.py` | All existing notebooks executed in order, with saved outputs |
+| `python -m pytest` | Calculation, regulatory-routing and reconciliation tests |
+| `python scripts/audit_notebooks.py` | Saved-execution and explanatory-structure checks |
+
+The notebooks are directly editable. On a fresh checkout, their shared data helper creates missing calculation files from the configuration. After changes to code or assumptions, the pipeline entry point refreshes those files before notebook execution. Local Python environments are machine-specific and are not part of the repository.
 
 ## Notebook sequence
 
@@ -68,10 +90,10 @@ The demonstration run uses 30,000 synthetic exposures, seed 42 and reporting dat
 
 | Metric | Base result |
 |---|---:|
-| Total EAD | INR 702,887.8 crore |
-| SA Credit RWA | INR 406,207.7 crore |
-| IRB Credit RWA | INR 728,676.4 crore |
-| Final Total RWA | INR 753,676.4 crore |
+| SA EAD before CRM | INR 700,735.5 crore |
+| SA Credit RWA | INR 405,323.4 crore |
+| IRB Credit RWA | INR 583,349.2 crore |
+| Final Total RWA | INR 608,349.2 crore |
 
 The results are synthetic and do not represent a real bank.
 
@@ -82,13 +104,13 @@ The results are synthetic and do not represent a real bank.
 - `config/`: Basel reference grids and transparent synthetic assumptions.
 - `data/sample/`: small GitHub-safe sample of the synthetic loan file.
 - `tests/`: calculation and reconciliation controls.
-- `outputs/demo/Basel_Credit_Capital_Report.xlsx`: reporting workbook.
+- `outputs/demo/Basel_Credit_Capital_Report.xlsx`: verified reporting snapshot built from the saved CSV tables.
 - `docs/`: methodology, field definitions, regulatory parameters and limitations.
 
-Generated full loan files remain outside Git tracking. The repository contains reproducible code, configuration, executed notebooks, the sample dataset and aggregate reporting output.
+Generated full loan files remain outside Git tracking. The repository contains code, configuration, executed notebooks, a sample covering every product segment and aggregate reporting output.
 
 ## Scope
 
-Included: synthetic loan generation, Basel exposure classes, contractual CCFs, loan-level EAD, selected CRM, Standardised Approach risk weights, residential mortgage LTV grids, synthetic long-run PD transitions, recovery-based downturn LGD, IRB EAD and maturity, Basel correlation functions, Vasicek conditional PD, capital K, SA and IRB Credit RWA, transparent market and operational RWA inputs, output floor, stress testing and capital adequacy.
+Included: synthetic loan generation, Basel exposure classes, contractual CCFs, loan-level EAD, selected CRM, Standardised Approach risk weights, residential mortgage LTV grids, synthetic long-run PD transitions, recovery-based downturn LGD, foundation and own-estimate IRB parameter routes, IRB EAD and maturity, Basel correlation functions, Vasicek conditional PD, capital K, SA and IRB Credit RWA, transparent market and operational RWA inputs, output floor, stress testing and capital adequacy.
 
 Excluded: real customer data, fitted production rating models, supervisory approval, jurisdiction-specific filing, counterparty credit risk, CVA, securitisation, FRTB, IFRS 9 ECL, ICAAP, liquidity and IRRBB.

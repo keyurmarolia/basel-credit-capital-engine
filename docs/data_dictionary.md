@@ -18,15 +18,15 @@ All identifiers and values are synthetic. Monetary calculation fields are stored
 | `managed_as_retail` | Exposure managed as part of a retail pool. |
 | `retail_transactor` | Qualifying full-repayment behaviour indicator. |
 | `annual_revenue` | Synthetic borrower annual revenue in INR. |
+| `group_total_assets` | Synthetic consolidated assets used as a borrower-scale and consistency field; it does not select a capital rule in this scope. |
 | `exposure_class_raw` | Source exposure class. |
 | `sector` | Economic sector. |
 | `geography` | Region. |
 | `currency` | Currency. The project uses INR. |
 | `external_rating` | External rating band. |
 | `internal_grade` | Internal grade. |
-| `pd_1y` | One-year probability of default. |
-| `lgd` | Loss given default. |
-| `maturity_years` | Maturity in years. |
+| `pd_1y` | Synthetic default-sampling probability, not the final long-run IRB PD. |
+| `origination_date` | Facility origination date. |
 | `contractual_maturity_years` | Contractual maturity before IRB floor or cap. |
 | `outstanding_balance` | Drawn principal. |
 | `credit_limit` | Facility limit. |
@@ -43,6 +43,8 @@ All identifiers and values are synthetic. Monetary calculation fields are stored
 | `regulatory_real_estate_eligible` | Basel real-estate eligibility indicator. |
 | `senior_lien_amount` | Senior lien amount outside the bank. |
 | `guarantee_value` | Guarantee amount. |
+| `guarantor_type` | Protection-provider category used by the selected guarantee validation. |
+| `guarantor_rating` | Synthetic guarantor rating used by the selected guarantee validation. |
 | `dpd` | Days past due. |
 | `default_flag` | Default indicator. |
 
@@ -63,7 +65,6 @@ All identifiers and values are synthetic. Monetary calculation fields are stored
 | `eligible_guarantee_value` | Recognised guarantee value. |
 | `sa_ead_post_crm` | SA EAD after mitigation. |
 | `crm_coverage_ratio` | Recognised protection divided by EAD. |
-| `lgd_after_crm` | LGD after collateral treatment. |
 
 ## RWA fields
 
@@ -82,6 +83,7 @@ All identifiers and values are synthetic. Monetary calculation fields are stored
 | `pd_input` | PD before regulatory treatment. |
 | `pd_transition_profile` | Sovereign, bank, corporate or retail transition profile. |
 | `pd_long_run` | Synthetic long-run one-year grade or pool PD. |
+| `pd_scenario` | Long-run anchor after the synthetic scenario multiplier; the original anchor remains unchanged. |
 | `pd_source` | PD estimation-source label. |
 | `pd_regulatory` | PD used in IRB calculation. |
 | `lgd_input` | LGD before regulatory treatment. |
@@ -92,20 +94,36 @@ All identifiers and values are synthetic. Monetary calculation fields are stored
 | `normal_workout_cost` | Normal recovery workout cost. |
 | `downturn_workout_cost` | Downturn recovery workout cost. |
 | `lgd_regulatory` | LGD used in IRB calculation. |
+| `lgd_source` | Supervisory foundation treatment or synthetic own recovery estimate. |
+| `foundation_lgd` | Supervisory secured/unsecured blend used only for foundation facilities. |
+| `lgd_floor_applied` | Class- and collateral-specific floor for own estimates; zero for foundation inputs. |
 | `ead_irb` | IRB EAD. |
+| `ead_irb_before_floor` | Funded exposure plus the selected IRB CCF times undrawn exposure. |
+| `ead_irb_floor` | Funded exposure plus the applicable fraction of SA-converted undrawn exposure. |
 | `irb_ccf` | CCF used for IRB EAD. |
 | `irb_ccf_source` | Foundation or synthetic own-estimate source label. |
 | `m_effective` | Effective maturity. |
+| `maturity_source` | Supervisory 2.5 years or bounded conservative contractual proxy. |
 | `maturity_floor_applied` | One-year floor indicator. |
 | `maturity_cap_applied` | Five-year cap indicator. |
 | `irb_function` | IRB formula family. |
 | `asset_correlation_r` | Asset correlation. |
 | `correlation_rule` | Basel correlation family used. |
 | `maturity_adjustment` | Maturity adjustment. |
-| `conditional_stressed_pd` | Conditional tail PD. |
 | `conditional_pd_999` | 99.9% conditional default probability. |
 | `expected_loss_rate` | PD multiplied by LGD. |
 | `expected_loss_amount` | PD multiplied by LGD and EAD. |
 | `capital_k` | Unexpected-loss capital per unit EAD. |
 | `irb_rwa` | 12.5 multiplied by K and EAD. |
 | `irb_rwa_density` | IRB RWA divided by IRB EAD. |
+
+## Eligibility and summary fields
+
+| Field | Description |
+|---|---|
+| `annual_revenue_eur` | Consolidated annual sales converted using the synthetic INR/EUR rate. |
+| `retail_counterparty_exposure` | Retail exposure summed by connected group after CCF conversion. |
+| `retail_granularity_pass` | Counterparty exposure does not exceed 0.2% of the eligible performing pool. |
+| `regulatory_retail_eligible` | Combined SA product, size and granularity tests. |
+| `qrre_eligible` | Separate IRB qualifying-revolving-retail eligibility under the stated assumptions. |
+| `weighted_pd`, `weighted_lgd` | EAD-weighted means: sum of parameter times EAD divided by total EAD. IRB summaries use IRB EAD; concentration summaries use SA pre-CRM EAD. |

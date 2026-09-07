@@ -4,7 +4,6 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 .ruff_cache/
-node_modules
 *.egg-info/
 .ipynb_checkpoints/
 .coverage

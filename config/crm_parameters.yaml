@@ -3,8 +3,11 @@ collateral:
   residential_property: {eligible: true, haircut: 0.20, treatment: ltv_and_lgd}
   commercial_property: {eligible: true, haircut: 0.30, treatment: ltv_and_lgd}
   cash: {eligible: true, haircut: 0.00, treatment: exposure_reduction}
-  government_securities: {eligible: true, haircut: 0.05, treatment: exposure_reduction}
 guarantee:
   eligible_haircut: 0.10
   guarantor_risk_weight: 0.20
-
+notes:
+  - The 10% guarantee haircut is synthetic conservatism, not a prescribed Basel haircut.
+  - Guarantees are assumed eligible AA bank protection with matching currency and maturity.
+  - Property haircut values here describe illustrative protection coverage only; they do not reduce SA EAD or determine IRB recovery.
+  - IRB supervisory collateral haircuts and secured LGDs are specified separately in irb_parameters.yaml.

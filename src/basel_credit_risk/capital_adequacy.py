@@ -25,7 +25,12 @@ def calculate_capital_adequacy(
     values = [
         ("CET1", stressed_cet1, stressed_cet1 / total_rwa, req["cet1_minimum"] + combined_buffer),
         ("Tier 1", tier1, tier1 / total_rwa, req["tier1_minimum"] + combined_buffer),
-        ("Total Capital", total_capital, total_capital / total_rwa, req["total_minimum"] + combined_buffer),
+        (
+            "Total Capital",
+            total_capital,
+            total_capital / total_rwa,
+            req["total_minimum"] + combined_buffer,
+        ),
     ]
     return pd.DataFrame(
         [

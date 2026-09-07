@@ -38,4 +38,3 @@ def test_base_stress_is_identity() -> None:
     current = result.exposures
     assert np.allclose(base["ead_pre_crm"], current["ead_pre_crm"])
     assert np.allclose(base["irb_rwa"], current["irb_rwa"])
-

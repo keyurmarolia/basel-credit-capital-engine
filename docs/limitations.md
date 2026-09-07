@@ -8,12 +8,17 @@
 - External ratings and guarantees are synthetic.
 - Rating-transition matrices and long-run PD anchors are synthetic and are not agency transition data.
 - Recovery rates, workout costs, recovery periods and own CCF estimates are transparent assumptions rather than fitted models.
-- Credit risk mitigation does not cover every haircut, currency or maturity rule.
+- CRM is limited to assumed-eligible same-currency cash, property and AA bank guarantees. The 10% guarantee haircut is a synthetic conservatism assumption, not a Basel-prescribed haircut. Currency/maturity mismatches and other collateral are excluded.
+- Eligible guarantees reduce Standardised Approach RWA only. The IRB calculation does not recognise guarantee substitution or double-default treatment.
 - Expected loss is not reconciled to accounting provisions.
-- Defaulted-exposure IRB treatment is simplified.
+- Defaulted-exposure IRB treatment is simplified to zero performing-loan K; best-estimate-loss versus LGD treatment is not implemented. Defaulted SA treatment is a simplified 150%, not the complete provision-dependent or defaulted-mortgage framework.
+- Claims are senior; specialised lending and financial institutions requiring the additional correlation multiplier are outside the selected scope. Synthetic bank counterparties are assumed below the large-financial-institution threshold. `Financial Services` is a business-sector label and does not create an additional regulated-institution exposure class.
+- Each synthetic connected group contains one borrower; multi-borrower affiliate groups are not modelled. Sector, grade and revenue remain consistent across that borrower's facilities.
+- Retail management, transactor history, collateral eligibility and qualifying-revolving pool behaviour are assumed, not proved from historical observations.
+- RWA bridge contributions depend on the disclosed replacement order; they are not unique causal attributions.
 - Market and Operational RWA are synthetic configured inputs; their Basel calculation routes are explained but not fitted from a trading book, financial statements or operational-loss database.
 - Stress multipliers and add-ons are synthetic sensitivities, not Basel-prescribed shocks or forecasts.
 - Stress loss is not IFRS 9 ECL.
 - Counterparty credit risk, CVA, securitisation, FRTB and operational-risk modelling are excluded.
 - ICAAP, liquidity, IRRBB and ALM are excluded.
-- National implementation, buffers and effective dates must be checked before real use.
+- The represented global framework does not establish national implementation, local buffers or eligibility for regulatory use.

@@ -29,7 +29,15 @@ def calculate_output_floor(
                 "Final aggregate RWA",
                 "Floor uplift",
             ],
-            "value": [sa_credit_rwa, irb_credit_rwa, standardised_total, model_total, floor_rate, floor_amount, final_total, final_total - model_total],
+            "value": [
+                sa_credit_rwa,
+                irb_credit_rwa,
+                standardised_total,
+                model_total,
+                floor_rate,
+                floor_amount,
+                final_total,
+                final_total - model_total,
+            ],
         }
     ).assign(floor_binding=final_total > model_total)
-

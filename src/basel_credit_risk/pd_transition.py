@@ -6,7 +6,9 @@ import numpy as np
 import pandas as pd
 
 
-def build_transition_matrix(profile: dict, matrix_method: dict, grade_order: list[str]) -> pd.DataFrame:
+def build_transition_matrix(
+    profile: dict, matrix_method: dict, grade_order: list[str]
+) -> pd.DataFrame:
     """Create a simple one-year matrix whose default column is the long-run PD anchor."""
     performing_grades = grade_order[:-1]
     stay_probability = float(matrix_method["stay_probability"])
@@ -46,9 +48,9 @@ def pd_profile_for_exposure(frame: pd.DataFrame) -> pd.Series:
     conditions = [
         frame["performing_exposure_class"].eq("sovereign"),
         frame["performing_exposure_class"].eq("bank"),
-        frame["performing_exposure_class"].isin(["corporate", "corporate_sme"]),
+        frame["performing_exposure_class"].isin(["corporate", "corporate_sme", "other"]),
         frame["performing_exposure_class"].eq("residential_real_estate"),
-        frame["performing_exposure_class"].isin(["revolving_retail", "retail_transactor"]),
+        frame["qrre_eligible"],
     ]
     profiles = [
         "sovereign",
@@ -74,9 +76,7 @@ def assign_long_run_pd(frame: pd.DataFrame, transition_config: dict) -> pd.DataF
     }
     out["pd_long_run"] = [
         float(default_rates[profile][grade])
-        for profile, grade in zip(
-            out["pd_transition_profile"], out["internal_grade"], strict=True
-        )
+        for profile, grade in zip(out["pd_transition_profile"], out["internal_grade"], strict=True)
     ]
     out.loc[out["default_flag"].eq(1), "pd_long_run"] = 1.0
     out["pd_source"] = "SYNTHETIC_LONG_RUN_TRANSITION_DEFAULT_COLUMN"

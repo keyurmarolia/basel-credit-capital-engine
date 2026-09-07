@@ -16,6 +16,5 @@ def test_generated_data_passes_validation() -> None:
     assert validate_exposures(portfolio.prior).empty
 
 
-def test_current_portfolio_has_requested_size() -> None:
+def test_current_portfolio_has_configured_size() -> None:
     assert len(generate_portfolio(1_000, 42).current) == 1_000
-

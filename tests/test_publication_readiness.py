@@ -26,9 +26,21 @@ def test_retail_functions_have_no_corporate_maturity_adjustment() -> None:
 
 
 def test_stress_increases_ead_and_expected_loss() -> None:
-    scenarios = run_pipeline(portfolio_size=1_000, write_outputs=False).tables["scenario_summary"].set_index("scenario")
-    assert scenarios.loc["base", "ead"] < scenarios.loc["adverse", "ead"] < scenarios.loc["severe", "ead"]
-    assert scenarios.loc["base", "expected_loss"] < scenarios.loc["adverse", "expected_loss"] < scenarios.loc["severe", "expected_loss"]
+    scenarios = (
+        run_pipeline(portfolio_size=1_000, write_outputs=False)
+        .tables["scenario_summary"]
+        .set_index("scenario")
+    )
+    assert (
+        scenarios.loc["base", "ead"]
+        < scenarios.loc["adverse", "ead"]
+        < scenarios.loc["severe", "ead"]
+    )
+    assert (
+        scenarios.loc["base", "expected_loss"]
+        < scenarios.loc["adverse", "expected_loss"]
+        < scenarios.loc["severe", "expected_loss"]
+    )
 
 
 def test_concentration_shares_sum_to_one() -> None:

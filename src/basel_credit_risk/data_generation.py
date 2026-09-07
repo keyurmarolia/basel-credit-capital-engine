@@ -7,6 +7,7 @@ synthetic: no source record represents a real customer or facility.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import date, timedelta
 
 import numpy as np
 import pandas as pd
@@ -37,8 +38,6 @@ GRADE_PD = {
 class SyntheticPortfolio:
     current: pd.DataFrame
     prior: pd.DataFrame
-    borrowers: pd.DataFrame
-    collateral: pd.DataFrame
 
 
 def _allocate_counts(size: int) -> dict[str, int]:
@@ -107,56 +106,60 @@ def _segment_frame(rng: np.random.Generator, segment: str, size: int, start: int
         collateral_type = np.full(size, "residential_property")
         ltv = np.clip(rng.normal(0.67, 0.17, size), 0.20, 1.35)
         collateral_value = outstanding / ltv
-        base_lgd = 0.12 + 0.42 * np.maximum(ltv - 0.55, 0)
         property_value_at_origination = collateral_value * rng.uniform(0.92, 1.08, size)
         property_value_current = collateral_value
         property_cashflow_dependent = rng.random(size) < 0.12
-        primary_residence = ~property_cashflow_dependent
         regulatory_real_estate_eligible = np.ones(size, dtype=bool)
     elif segment in {"large_corporate", "sme"}:
         secured = rng.random(size) < (0.55 if segment == "sme" else 0.40)
         collateral_type = np.where(secured, "commercial_property", "none")
         coverage = rng.uniform(0.40, 1.30, size) * secured
         collateral_value = outstanding * coverage
-        base_lgd = np.where(secured, 0.30, 0.48)
         property_value_at_origination = collateral_value * rng.uniform(0.90, 1.10, size)
         property_value_current = collateral_value
         property_cashflow_dependent = np.zeros(size, dtype=bool)
-        primary_residence = np.zeros(size, dtype=bool)
         regulatory_real_estate_eligible = np.zeros(size, dtype=bool)
     elif segment == "sovereign":
         collateral_type = np.full(size, "none")
         collateral_value = np.zeros(size)
-        base_lgd = np.full(size, 0.25)
         property_value_at_origination = np.zeros(size)
         property_value_current = np.zeros(size)
         property_cashflow_dependent = np.zeros(size, dtype=bool)
-        primary_residence = np.zeros(size, dtype=bool)
         regulatory_real_estate_eligible = np.zeros(size, dtype=bool)
     elif segment == "bank":
         cash_secured = rng.random(size) < 0.18
         collateral_type = np.where(cash_secured, "cash", "none")
         collateral_value = outstanding * rng.uniform(0.40, 1.00, size) * cash_secured
-        base_lgd = np.where(cash_secured, 0.22, 0.45)
         property_value_at_origination = np.zeros(size)
         property_value_current = np.zeros(size)
         property_cashflow_dependent = np.zeros(size, dtype=bool)
-        primary_residence = np.zeros(size, dtype=bool)
         regulatory_real_estate_eligible = np.zeros(size, dtype=bool)
     else:
         collateral_type = np.full(size, "none")
         collateral_value = np.zeros(size)
-        base_lgd = np.full(size, 0.60 if segment == "credit_card" else 0.52)
         property_value_at_origination = np.zeros(size)
         property_value_current = np.zeros(size)
         property_cashflow_dependent = np.zeros(size, dtype=bool)
-        primary_residence = np.zeros(size, dtype=bool)
         regulatory_real_estate_eligible = np.zeros(size, dtype=bool)
 
-    lgd = np.clip(base_lgd + rng.normal(0, 0.035, size), 0.05, 0.85)
     default_flag = rng.random(size) < np.minimum(pd_1y * 0.75, 0.20)
-    dpd = np.where(default_flag, rng.integers(91, 361, size), rng.choice([0, 0, 0, 5, 15, 30, 60], size=size))
-    sectors = np.array(["Construction", "Real Estate", "Metals", "Textiles", "Auto Components", "IT Services", "Healthcare", "Consumer", "Financial Services", "Government"])
+    dpd = np.where(
+        default_flag, rng.integers(91, 361, size), rng.choice([0, 0, 0, 5, 15, 30, 60], size=size)
+    )
+    sectors = np.array(
+        [
+            "Construction",
+            "Real Estate",
+            "Metals",
+            "Textiles",
+            "Auto Components",
+            "IT Services",
+            "Healthcare",
+            "Consumer",
+            "Financial Services",
+            "Government",
+        ]
+    )
     if segment == "sovereign":
         sector = np.full(size, "Government")
     elif segment in {"mortgage", "personal_loan", "credit_card"}:
@@ -166,7 +169,11 @@ def _segment_frame(rng: np.random.Generator, segment: str, size: int, start: int
     else:
         sector = rng.choice(sectors[:-1], size=size)
 
-    repeat = 1 if segment in {"mortgage", "personal_loan", "credit_card"} else (3 if segment in {"large_corporate", "bank"} else 2)
+    repeat = (
+        1
+        if segment in {"mortgage", "personal_loan", "credit_card"}
+        else (3 if segment in {"large_corporate", "bank"} else 2)
+    )
     borrower_numbers = start + np.arange(size) // repeat
     guarantee = np.where(rng.random(size) < 0.08, outstanding * rng.uniform(0.2, 0.8, size), 0.0)
     is_individual = segment in {"mortgage", "personal_loan", "credit_card"}
@@ -191,9 +198,9 @@ def _segment_frame(rng: np.random.Generator, segment: str, size: int, start: int
 
     return pd.DataFrame(
         {
-            "exposure_id": [f"EXP-{start+i:07d}" for i in range(size)],
+            "exposure_id": [f"EXP-{start + i:07d}" for i in range(size)],
             "borrower_id": [f"BOR-{x:07d}" for x in borrower_numbers],
-            "connected_group_id": [f"GRP-{x//5:06d}" for x in borrower_numbers],
+            "connected_group_id": [f"GRP-{x:07d}" for x in borrower_numbers],
             "reporting_date": pd.Timestamp("2026-06-30"),
             "segment": segment,
             "product_type": product_map[segment],
@@ -206,14 +213,16 @@ def _segment_frame(rng: np.random.Generator, segment: str, size: int, start: int
             "group_total_assets": group_total_assets,
             "exposure_class_raw": segment,
             "sector": sector,
-            "geography": rng.choice(["North", "West", "South", "East", "Central"], size=size, p=[0.20, 0.30, 0.25, 0.15, 0.10]),
+            "geography": rng.choice(
+                ["North", "West", "South", "East", "Central"],
+                size=size,
+                p=[0.20, 0.30, 0.25, 0.15, 0.10],
+            ),
             "currency": "INR",
             "external_rating": grades,
             "internal_grade": grades,
             "pd_1y": pd_1y,
-            "lgd": lgd,
             "origination_date": origination_date,
-            "maturity_years": contractual_maturity,
             "contractual_maturity_years": contractual_maturity,
             "outstanding_balance": outstanding,
             "credit_limit": credit_limit,
@@ -227,7 +236,6 @@ def _segment_frame(rng: np.random.Generator, segment: str, size: int, start: int
             "property_value_at_origination": property_value_at_origination,
             "property_value_current": property_value_current,
             "property_cashflow_dependent": property_cashflow_dependent,
-            "primary_residence": primary_residence,
             "regulatory_real_estate_eligible": regulatory_real_estate_eligible,
             "senior_lien_amount": np.zeros(size),
             "guarantee_value": guarantee,
@@ -239,8 +247,31 @@ def _segment_frame(rng: np.random.Generator, segment: str, size: int, start: int
     )
 
 
-def generate_portfolio(size: int = 30_000, seed: int = 42) -> SyntheticPortfolio:
-    """Generate current/prior exposure snapshots and supporting masters."""
+def _consistent_borrowers(frame: pd.DataFrame) -> pd.DataFrame:
+    """One borrower has one sector, region, grade, revenue and default status."""
+    out = frame.copy()
+    columns = [
+        "sector",
+        "geography",
+        "internal_grade",
+        "external_rating",
+        "pd_1y",
+        "annual_revenue",
+        "group_total_assets",
+        "default_flag",
+        "dpd",
+    ]
+    out[columns] = out.groupby("borrower_id")[columns].transform("first")
+    return out
+
+
+def generate_portfolio(
+    size: int = 30_000,
+    seed: int = 42,
+    reporting_date: str = "2026-06-30",
+    prior_reporting_date: str = "2025-12-31",
+) -> SyntheticPortfolio:
+    """Generate consistent current/prior snapshots; all inputs are synthetic."""
     if size < 100:
         raise ValueError("Portfolio size must be at least 100 exposures.")
     rng = np.random.default_rng(seed)
@@ -249,37 +280,55 @@ def generate_portfolio(size: int = 30_000, seed: int = 42) -> SyntheticPortfolio
     for segment, count in _allocate_counts(size).items():
         frames.append(_segment_frame(rng, segment, count, start))
         start += count
-    current = pd.concat(frames, ignore_index=True)
+    current = _consistent_borrowers(pd.concat(frames, ignore_index=True))
+    date_shift = pd.Timestamp(reporting_date) - pd.Timestamp("2026-06-30")
+    current["origination_date"] += date_shift
+    current["reporting_date"] = pd.Timestamp(reporting_date)
 
     prior = current.copy()
-    prior["reporting_date"] = pd.Timestamp("2025-12-31")
+    prior["reporting_date"] = pd.Timestamp(prior_reporting_date)
     prior["outstanding_balance"] *= rng.uniform(0.88, 1.12, len(prior))
-    prior["credit_limit"] = np.maximum(prior["credit_limit"] * rng.uniform(0.95, 1.05, len(prior)), prior["outstanding_balance"])
+    prior["credit_limit"] = np.maximum(
+        prior["credit_limit"] * rng.uniform(0.95, 1.05, len(prior)), prior["outstanding_balance"]
+    )
     prior["undrawn_amount"] = np.maximum(prior["credit_limit"] - prior["outstanding_balance"], 0)
     non_revolving = ~prior["revolving_flag"]
-    prior.loc[non_revolving, "credit_limit"] = prior.loc[
-        non_revolving, "outstanding_balance"
-    ]
+    prior.loc[non_revolving, "credit_limit"] = prior.loc[non_revolving, "outstanding_balance"]
     prior.loc[non_revolving, "undrawn_amount"] = 0.0
-    prior["pd_1y"] = np.clip(prior["pd_1y"] * rng.uniform(0.80, 1.10, len(prior)), 0.00005, 0.45)
-    prior["lgd"] = np.clip(prior["lgd"] + rng.normal(-0.01, 0.015, len(prior)), 0.05, 0.85)
-    prior["maturity_years"] = prior["maturity_years"] + 0.5
+    prior["accrued_interest"] *= prior["outstanding_balance"] / current["outstanding_balance"]
+    elapsed_years = (
+        pd.Timestamp(reporting_date) - pd.Timestamp(prior_reporting_date)
+    ).days / 365.25
+    prior["contractual_maturity_years"] += elapsed_years
+    prior["collateral_value"] *= 1.05
+    prior["property_value_current"] *= 1.05
+    borrowers = prior["borrower_id"].drop_duplicates()
+    migrations = dict(
+        zip(borrowers, rng.choice([-1, 0, 1], len(borrowers), p=[0.18, 0.77, 0.05]), strict=True)
+    )
+    grades = list(GRADE_PD)
+    grade_number = prior["internal_grade"].map({grade: i for i, grade in enumerate(grades)})
+    prior["internal_grade"] = (
+        (grade_number + prior["borrower_id"].map(migrations))
+        .clip(0, 6)
+        .map(dict(enumerate(grades)))
+    )
+    prior["external_rating"] = prior["internal_grade"]
+    prior["pd_1y"] = prior["internal_grade"].map(GRADE_PD)
 
-    new_mask = rng.random(len(current)) < 0.025
+    # New facilities must not appear before their origination date.
+    new_mask = (rng.random(len(current)) < 0.025) | current["origination_date"].gt(
+        pd.Timestamp(prior_reporting_date)
+    )
     prior = prior.loc[~new_mask].copy()
     runoff_count = max(1, int(size * 0.02))
-    runoff = _segment_frame(rng, "sme", runoff_count, size + 100_000)
-    runoff["reporting_date"] = pd.Timestamp("2025-12-31")
+    runoff = _consistent_borrowers(_segment_frame(rng, "sme", runoff_count, size + 100_000))
+    runoff["reporting_date"] = pd.Timestamp(prior_reporting_date)
+    runoff["origination_date"] = pd.Series(
+        pd.Timestamp(date.fromisoformat(str(prior_reporting_date)) - timedelta(days=365)),
+        index=runoff.index,
+        dtype="datetime64[ns]",
+    )
     prior = pd.concat([prior, runoff], ignore_index=True)
 
-    borrowers = (
-        pd.concat([current[["borrower_id", "connected_group_id", "sector", "geography"]], prior[["borrower_id", "connected_group_id", "sector", "geography"]]])
-        .drop_duplicates("borrower_id")
-        .reset_index(drop=True)
-    )
-    collateral = (
-        current.loc[current["collateral_type"] != "none", ["exposure_id", "collateral_type", "collateral_value"]]
-        .assign(valuation_date=pd.Timestamp("2026-05-31"), eligible_flag=1)
-        .reset_index(drop=True)
-    )
-    return SyntheticPortfolio(current=current, prior=prior, borrowers=borrowers, collateral=collateral)
+    return SyntheticPortfolio(current=current, prior=prior)

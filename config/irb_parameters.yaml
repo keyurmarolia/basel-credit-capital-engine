@@ -1,5 +1,26 @@
 pd_floor: 0.0005
-lgd_floor: 0.05
+qrre_revolver_pd_floor: 0.001
+lgd_floors:
+  corporate_unsecured: 0.25
+  other_retail_unsecured: 0.30
+  qrre: 0.50
+  mortgage: 0.05
+  cash: 0.00
+  commercial_property: 0.10
+  residential_property: 0.10
+foundation_lgd:
+  bank_unsecured: 0.45
+  corporate_unsecured: 0.40
+  cash: 0.00
+  commercial_property: 0.20
+  residential_property: 0.20
+irb_collateral_haircuts:
+  none: 1.00
+  cash: 0.00
+  commercial_property: 0.40
+  residential_property: 0.40
+foundation_maturity: 2.5
+own_ead_floor_fraction: 0.50
 maturity_min: 1.0
 maturity_max: 5.0
 confidence_level: 0.999
@@ -11,7 +32,9 @@ exposure_classes:
   sovereign: corporate
   residential_real_estate: mortgage
   revolving_retail: qrre
+  retail_transactor: qrre
   regulatory_retail: other_retail
+  other_retail: other_retail
   other: corporate
 recovery_assumptions:
   mortgage: {normal_collateral_recovery: 0.90, downturn_collateral_recovery: 0.72, normal_unsecured_recovery: 0.18, downturn_unsecured_recovery: 0.10, normal_cost_rate: 0.03, downturn_cost_rate: 0.06, normal_recovery_years: 1.5, downturn_recovery_years: 2.5}
@@ -24,7 +47,6 @@ recovery_assumptions:
   other: {normal_collateral_recovery: 0.50, downturn_collateral_recovery: 0.35, normal_unsecured_recovery: 0.25, downturn_unsecured_recovery: 0.14, normal_cost_rate: 0.06, downturn_cost_rate: 0.10, normal_recovery_years: 2.0, downturn_recovery_years: 3.0}
 recovery_discount_rate: 0.08
 large_corporate_airb_revenue_limit_eur: 500000000
-inr_per_eur: 100.0
 own_ccf_estimates:
   no_commitment: 0.00
   unconditionally_cancellable: 0.15

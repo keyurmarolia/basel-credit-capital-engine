@@ -23,6 +23,7 @@ def load_all_config(config_dir: Path | None = None) -> dict[str, Any]:
         "regulatory_scope.yaml",
         "regulatory_sources.yaml",
         "ccf_parameters.yaml",
+        "classification_parameters.yaml",
         "crm_parameters.yaml",
         "sa_risk_weights.yaml",
         "irb_parameters.yaml",

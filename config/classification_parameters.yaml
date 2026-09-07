@@ -1,0 +1,9 @@
+inr_per_eur: 100.0
+corporate_sme_sales_limit_eur: 50000000
+retail_counterparty_limit_eur: 1000000
+retail_granularity_limit: 0.002
+qrre_limit_eur: 100000
+notes:
+  - INR per EUR is a synthetic conversion assumption, not an observed exchange rate.
+  - Sales and retail size thresholds follow CRE20.47 and CRE20.65; QRRE size follows CRE30.23.
+  - Retail management and qualifying revolving-pool behaviour are synthetic eligibility assumptions, not empirically validated findings.

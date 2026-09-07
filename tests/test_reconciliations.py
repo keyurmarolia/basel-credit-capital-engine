@@ -19,6 +19,10 @@ def test_capital_ratio_identity() -> None:
 
 
 def test_scenario_ordering() -> None:
-    scenarios = run_pipeline(portfolio_size=1_000, write_outputs=False).tables["scenario_summary"].set_index("scenario")
+    scenarios = (
+        run_pipeline(portfolio_size=1_000, write_outputs=False)
+        .tables["scenario_summary"]
+        .set_index("scenario")
+    )
     assert scenarios.loc["base", "irb_credit_rwa"] < scenarios.loc["adverse", "irb_credit_rwa"]
     assert scenarios.loc["adverse", "irb_credit_rwa"] < scenarios.loc["severe", "irb_credit_rwa"]

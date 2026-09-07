@@ -2,41 +2,53 @@
 
 from __future__ import annotations
 
-import numpy as np
 import pandas as pd
 
+from .config import load_yaml
+from .irb_rwa import calculate_irb_rwa
 
-def attribute_rwa(prior: pd.DataFrame, current: pd.DataFrame, metric: str = "irb_rwa") -> pd.DataFrame:
-    """Explain RWA movement with transparent sequential proxy drivers."""
-    cols = ["exposure_id", metric, "ead_pre_crm", "pd_regulatory", "lgd_regulatory", "m_effective"]
-    merged = prior[cols].merge(current[cols], on="exposure_id", how="outer", suffixes=("_prior", "_current"), indicator=True)
-    prior_total = merged[f"{metric}_prior"].fillna(0).sum()
-    current_total = merged[f"{metric}_current"].fillna(0).sum()
-    new_business = merged.loc[merged["_merge"].eq("right_only"), f"{metric}_current"].sum()
-    runoff = -merged.loc[merged["_merge"].eq("left_only"), f"{metric}_prior"].sum()
-    stable = merged["_merge"].eq("both")
-    p_rwa = merged.loc[stable, f"{metric}_prior"]
-    c_rwa = merged.loc[stable, f"{metric}_current"]
-    p_ead = merged.loc[stable, "ead_pre_crm_prior"].replace(0, np.nan)
-    c_ead = merged.loc[stable, "ead_pre_crm_current"]
-    ead_effect = ((c_ead - p_ead) * (p_rwa / p_ead)).fillna(0).sum()
-    stable_change_after_ead = (c_rwa - p_rwa).sum() - ead_effect
-    pd_change = (merged.loc[stable, "pd_regulatory_current"] - merged.loc[stable, "pd_regulatory_prior"]).abs().sum()
-    lgd_change = (merged.loc[stable, "lgd_regulatory_current"] - merged.loc[stable, "lgd_regulatory_prior"]).abs().sum()
-    m_change = (merged.loc[stable, "m_effective_current"] - merged.loc[stable, "m_effective_prior"]).abs().sum()
-    scale = pd_change + lgd_change + m_change
-    if scale == 0:
-        pd_effect = lgd_effect = maturity_effect = 0.0
-    else:
-        pd_effect = stable_change_after_ead * pd_change / scale
-        lgd_effect = stable_change_after_ead * lgd_change / scale
-        maturity_effect = stable_change_after_ead * m_change / scale
-    residual = current_total - (prior_total + new_business + runoff + ead_effect + pd_effect + lgd_effect + maturity_effect)
-    return pd.DataFrame(
-        {
-            "driver": ["Prior RWA", "New business", "Run-off / repayment", "EAD movement", "Rating / PD migration", "LGD / collateral", "Maturity", "Residual", "Current RWA"],
-            "amount": [prior_total, new_business, runoff, ead_effect, pd_effect, lgd_effect, maturity_effect, residual, current_total],
-            "kind": ["total", "change", "change", "change", "change", "change", "change", "change", "total"],
-        }
+
+def attribute_rwa(
+    prior: pd.DataFrame, current: pd.DataFrame, config: dict | None = None
+) -> pd.DataFrame:
+    """Replace inputs sequentially; nonlinear interactions follow the stated order."""
+    config = config or load_yaml("irb_parameters.yaml")
+    previous = prior.set_index("exposure_id")
+    latest = current.set_index("exposure_id")
+    stable_ids = previous.index.intersection(latest.index)
+    prior_total = previous["irb_rwa"].sum()
+    current_total = latest["irb_rwa"].sum()
+    new = latest.loc[latest.index.difference(previous.index), "irb_rwa"].sum()
+    runoff = -previous.loc[previous.index.difference(latest.index), "irb_rwa"].sum()
+    rows = [
+        ["Prior RWA", prior_total, "total"],
+        ["New business", new, "change"],
+        ["Run-off / repayment", runoff, "change"],
+    ]
+    state = previous.loc[stable_ids].copy()
+    value = state["irb_rwa"].sum()
+    groups = {
+        "EAD movement": ["ead_irb"],
+        "Rating / PD migration": ["pd_regulatory"],
+        "LGD / collateral": ["lgd_regulatory"],
+        "Maturity": ["m_effective"],
+        "Class / eligibility / default": [
+            "irb_function",
+            "performing_exposure_class",
+            "annual_revenue_eur",
+            "default_flag",
+        ],
+    }
+    for driver, columns in groups.items():
+        state[columns] = latest.loc[stable_ids, columns]
+        next_value = calculate_irb_rwa(state, config)["irb_rwa"].sum()
+        rows.append([driver, next_value - value, "change"])
+        value = next_value
+    explained = prior_total + sum(row[1] for row in rows if row[2] == "change")
+    rows.extend(
+        [
+            ["Rounding residual", current_total - explained, "change"],
+            ["Current RWA", current_total, "total"],
+        ]
     )
-
+    return pd.DataFrame(rows, columns=["driver", "amount", "kind"])
