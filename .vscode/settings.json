@@ -4,4 +4,3 @@
   "python.testing.pytestArgs": ["tests"],
   "jupyter.notebookFileRoot": "${workspaceFolder}"
 }
-
