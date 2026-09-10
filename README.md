@@ -8,6 +8,29 @@ This project follows 30,000 synthetic bank loans from contractual data to Standa
 
 All calculations occur at loan level before aggregation. The Standardised Approach is completed before IRB begins.
 
+## Full-run results
+
+The demonstration run uses 30,000 synthetic exposures, seed 42 and reporting date 30 June 2026. Monetary values are shown in INR crore.
+
+| Metric | Base result |
+|---|---:|
+| SA EAD before CRM | INR 700,735.5 crore |
+| SA Credit RWA | INR 405,323.4 crore |
+| IRB Credit RWA | INR 583,349.2 crore |
+| Final Total RWA | INR 608,349.2 crore |
+
+The results are synthetic and do not represent a real bank.
+
+![Synthetic portfolio credit RWA under SA and IRB](docs/assets/results-preview.png)
+
+## Explore the analysis
+
+[Download the Excel report](outputs/demo/Basel_Credit_Capital_Report.xlsx) · [Calculation map](notebooks/00_complete_calculation_map.ipynb) · [SA–IRB comparison](notebooks/15_sa_irb_comparison_and_output_floor.ipynb) · [Stress and capital headroom](notebooks/18_stress_testing_and_capital_adequacy.ipynb)
+
+IRB credit RWA is higher than SA credit RWA in this configured portfolio. SA uses class-based regulatory weights, while IRB uses the synthetic PD, downturn LGD, EAD and maturity assumptions. IRB is not guaranteed to reduce capital. Compare class-level RWA and the method-specific exposure denominators in notebook 15 before interpreting the difference. The output floor does not bind in the saved base run.
+
+Market RWA of INR 11,000 crore and operational RWA of INR 14,000 crore are configured synthetic inputs; this project calculates the credit component. [Limitations](docs/limitations.md) separates the implemented calculations from assumptions and exclusions.
+
 ## Reproducibility
 
 The project uses Python 3.12. Dependencies and test tools are defined in `pyproject.toml`.
@@ -84,19 +107,6 @@ The notebooks are directly editable. On a fresh checkout, their shared data help
 4. Loan-level PD, LGD, EAD and RWA changes
 5. Capital ratio and headroom impact
 
-## Full-run results
-
-The demonstration run uses 30,000 synthetic exposures, seed 42 and reporting date 30 June 2026. Monetary values are shown in INR crore.
-
-| Metric | Base result |
-|---|---:|
-| SA EAD before CRM | INR 700,735.5 crore |
-| SA Credit RWA | INR 405,323.4 crore |
-| IRB Credit RWA | INR 583,349.2 crore |
-| Final Total RWA | INR 608,349.2 crore |
-
-The results are synthetic and do not represent a real bank.
-
 ## Project structure
 
 - `notebooks/`: executed chronological analysis with saved charts and tables.
@@ -104,13 +114,17 @@ The results are synthetic and do not represent a real bank.
 - `config/`: Basel reference grids and transparent synthetic assumptions.
 - `data/sample/`: small GitHub-safe sample of the synthetic loan file.
 - `tests/`: calculation and reconciliation controls.
-- `outputs/demo/Basel_Credit_Capital_Report.xlsx`: verified reporting snapshot built from the saved CSV tables.
+- [Excel reporting snapshot](outputs/demo/Basel_Credit_Capital_Report.xlsx): verified reporting snapshot built from the saved CSV tables.
 - `docs/`: methodology, field definitions, regulatory parameters and limitations.
 
 Generated full loan files remain outside Git tracking. The repository contains code, configuration, executed notebooks, a sample covering every product segment and aggregate reporting output.
 
-## Scope
+## Coverage and limitations
 
 Included: synthetic loan generation, Basel exposure classes, contractual CCFs, loan-level EAD, selected CRM, Standardised Approach risk weights, residential mortgage LTV grids, synthetic long-run PD transitions, recovery-based downturn LGD, foundation and own-estimate IRB parameter routes, IRB EAD and maturity, Basel correlation functions, Vasicek conditional PD, capital K, SA and IRB Credit RWA, transparent market and operational RWA inputs, output floor, stress testing and capital adequacy.
 
 Excluded: real customer data, fitted production rating models, supervisory approval, jurisdiction-specific filing, counterparty credit risk, CVA, securitisation, FRTB, IFRS 9 ECL, ICAAP, liquidity and IRRBB.
+
+## Related projects
+
+[IFRS 9 ECL](https://github.com/keyurmarolia/ifrs9-mortgage-ecl) · [FRTB market risk](https://github.com/keyurmarolia/frtb-market-risk-engine) · [Momentum research](https://github.com/keyurmarolia/momentum-in-indian-equities-research) · [InterGlobe valuation](https://github.com/keyurmarolia/interglobe-aviation-equity-research-model)
